@@ -43,19 +43,17 @@ public class Inventario {
             this.Inventario.add(producto);
         } else {
             boolean exist = false;
+            Integer index = null;
+            long cantidad = 0;
             for (int i = 0; i < this.Inventario.size(); i++) {
                 if (this.Inventario.get(i).getId() == producto.getId()) {
                     exist = true;
-                    break;
+                    index = i;
+                    cantidad = this.Inventario.get(i).getCantidad() + 1;
                 }
             }
-            if (exist) {
-                for (int i = 0; i < this.Inventario.size(); i++) {
-                    if (this.Inventario.get(i).getId() == producto.getId()) {
-                        long cantidad = this.Inventario.get(i).getCantidad();
-                        this.Inventario.get(i).setCantidad(cantidad);
-                    }
-                }
+            if (exist && index != null) {
+                this.Inventario.get(index).setCantidad(cantidad);
             } else {
                 this.Inventario.add(producto);
             }
@@ -73,8 +71,8 @@ public class Inventario {
             this.Inventario.remove(productoPivot);
         }
     }
-    
-    public void editProducto(int id, long cantidad){
+
+    public void editProducto(int id, long cantidad) {
         Producto productoPivot = null;
         for (Producto producto : this.Inventario) {
             if (id == producto.getId()) {
