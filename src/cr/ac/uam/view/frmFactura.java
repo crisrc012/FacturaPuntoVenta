@@ -351,7 +351,7 @@ public class frmFactura extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             addProducto();
         } else {
-
+            
         }
     }//GEN-LAST:event_jBtnFacturarActionPerformed
 

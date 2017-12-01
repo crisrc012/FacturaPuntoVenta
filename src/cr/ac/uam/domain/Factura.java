@@ -13,6 +13,7 @@ import java.util.Date;
  * @author crobles
  */
 public class Factura {
+
     private int id;
     private Cliente cliente;
     private Date fecha;

@@ -5,11 +5,9 @@
  */
 package cr.ac.uam.bl;
 
-import cr.ac.uam.domain.Cliente;
+import cr.ac.uam.data.CSVReader;
 import cr.ac.uam.domain.Factura;
-import cr.ac.uam.domain.Producto;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  *
@@ -20,7 +18,8 @@ public class Facturacion {
     private ArrayList<Factura> Facturas = null;
 
     public Facturacion() {
-        Facturas = new ArrayList<>();
+        CSVReader facturas = new CSVReader();
+        Facturas = facturas.readFacturasFromCSV();
     }
 
     public Facturacion(ArrayList<Factura> Facturas) {
