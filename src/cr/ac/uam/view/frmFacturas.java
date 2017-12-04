@@ -5,7 +5,9 @@
  */
 package cr.ac.uam.view;
 
+import cr.ac.uam.bl.Facturacion;
 import cr.ac.uam.bl.Inventario;
+import cr.ac.uam.domain.Factura;
 import cr.ac.uam.domain.Producto;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -17,7 +19,7 @@ import javax.swing.table.DefaultTableModel;
 public class frmFacturas extends javax.swing.JFrame {
 
     public Producto productoActual = null;
-    private Inventario Inventario = null;
+    private Facturacion facturas = null;
 
     /**
      * Creates new form frmInventario
@@ -25,12 +27,12 @@ public class frmFacturas extends javax.swing.JFrame {
     public frmFacturas() {
         initComponents();
         DefaultTableModel model = (DefaultTableModel) jTableProductos.getModel();
-        Inventario = new Inventario(false);
-        for (Producto producto : Inventario.getInventario()) {
-            model.addRow(new Object[]{producto.getId(),
-                producto.getDescripcion(),
-                producto.getValor(),
-                producto.getCantidad()});
+        facturas = new Facturacion();
+        for (Factura factura : facturas.getFacturas()) {
+            model.addRow(new Object[]{
+                factura.getId(),
+                factura.getCliente().getNombre() + " " + factura.getCliente().getApellido(),
+                factura.getFecha()});
         }
     }
 

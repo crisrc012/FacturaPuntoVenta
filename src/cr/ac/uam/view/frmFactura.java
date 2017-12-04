@@ -9,6 +9,8 @@ import cr.ac.uam.bl.Inventario;
 import cr.ac.uam.domain.Cliente;
 import cr.ac.uam.domain.Producto;
 import java.awt.HeadlessException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -21,6 +23,7 @@ public class frmFactura extends javax.swing.JFrame {
     // JFrames
     private static frmClientes frmclientes = null;
     private static frmInventario frminventario = null;
+    private static frmFacturas frmfacturas = null;
 
     // Variables globales
     public static Cliente clienteActual = null;
@@ -33,6 +36,7 @@ public class frmFactura extends javax.swing.JFrame {
     public frmFactura() {
         initComponents();
         Productos = new Inventario(true);
+        System.out.println(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
     }
 
     /**
@@ -60,7 +64,7 @@ public class frmFactura extends javax.swing.JFrame {
         jLabelProductos = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItemImprimir = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -145,8 +149,13 @@ public class frmFactura extends javax.swing.JFrame {
 
         jMenu1.setText("Archivo");
 
-        jMenuItem1.setText("Imprimir factura a PDF");
-        jMenu1.add(jMenuItem1);
+        jMenuItemImprimir.setText("Imprimir factura a PDF");
+        jMenuItemImprimir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemImprimirActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemImprimir);
 
         jMenuBar1.add(jMenu1);
 
@@ -355,6 +364,16 @@ public class frmFactura extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jBtnFacturarActionPerformed
 
+    private void jMenuItemImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemImprimirActionPerformed
+        if (frmfacturas == null) {
+            frmfacturas = new frmFacturas();
+            frmfacturas.setVisible(true);
+        } else if (!frmfacturas.isVisible()) {
+            frmfacturas.setVisible(true);
+        }
+        frmfacturas.toFront();
+    }//GEN-LAST:event_jMenuItemImprimirActionPerformed
+
     public static void setclienteActual(Cliente cliente) {
         frmFactura.clienteActual = cliente;
         setClienteActualLabel();
@@ -439,7 +458,7 @@ public class frmFactura extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabelTotalValue;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItemImprimir;
     private javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JTable jTableFactura;
     // End of variables declaration//GEN-END:variables

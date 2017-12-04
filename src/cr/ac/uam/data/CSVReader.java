@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 
 /**
@@ -95,7 +95,7 @@ public class CSVReader {
                 // Productos
                 String[] idProductos = attributes[3].split(",");
                 Inventario inventario = new Inventario(false);
-                ArrayList<Producto> productos = new ArrayList<Producto>();
+                ArrayList<Producto> productos = new ArrayList<>();
                 Producto producto = null;
                 for (int i = 0; i < idProductos.length; i++) {
                     for (int j = 0; j < inventario.getInventario().size(); j++) {
@@ -104,20 +104,21 @@ public class CSVReader {
                         }
                     }
                 }
-                Factura factura = new Factura(Integer.parseInt(attributes[0]),
-                        cliente,
-                        Date.valueOf(attributes[2]),
-                        productos);
-                facturas.add(factura);
+                Date
+//                Factura factura = new Factura(Integer.parseInt(attributes[0]),
+//                        cliente,
+//                        Date.valueOf(attributes[2]),
+//                        productos);
+//                facturas.add(factura);
                 line = br.readLine();
             }
         } catch (IOException ex) {
         }
-        for(Factura f : facturas){
+        for (Factura f : facturas) {
             System.out.println(f.getCliente().getNombre() + "\n"
-            + f.getFecha() + "\n"
-            + f.getId() + "\n");
-            for(Producto p : f.getProductos()){
+                    + f.getFecha() + "\n"
+                    + f.getId() + "\n");
+            for (Producto p : f.getProductos()) {
                 System.out.println(p.getDescripcion() + " ");
             }
             System.out.println("\n---------------------------\n");
