@@ -16,6 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 
@@ -76,6 +79,18 @@ public class CSVReader {
         return clientes;
     }
 
+    private Date StringToDate(String date) {
+        try {
+            DateFormat formatter;
+            Date Date;
+            formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Date = (Date) formatter.parse(date);
+            return Date;
+        } catch (ParseException e) {
+            return new Date();
+        }
+    }
+
     public ArrayList<Factura> readFacturasFromCSV() {
         ArrayList<Factura> facturas = new ArrayList<>();
         Path pathToFile = Paths.get(path + "/Facturas.csv");
@@ -104,25 +119,16 @@ public class CSVReader {
                         }
                     }
                 }
-                Date
-//                Factura factura = new Factura(Integer.parseInt(attributes[0]),
-//                        cliente,
-//                        Date.valueOf(attributes[2]),
-//                        productos);
-//                facturas.add(factura);
+                Factura factura = new Factura(Integer.parseInt(attributes[0]),
+                        cliente,
+                        StringToDate(attributes[2]),
+                        productos);
+                facturas.add(factura);
                 line = br.readLine();
             }
+            return facturas;
         } catch (IOException ex) {
+            return new ArrayList<>();
         }
-        for (Factura f : facturas) {
-            System.out.println(f.getCliente().getNombre() + "\n"
-                    + f.getFecha() + "\n"
-                    + f.getId() + "\n");
-            for (Producto p : f.getProductos()) {
-                System.out.println(p.getDescripcion() + " ");
-            }
-            System.out.println("\n---------------------------\n");
-        }
-        return facturas;
     }
 }

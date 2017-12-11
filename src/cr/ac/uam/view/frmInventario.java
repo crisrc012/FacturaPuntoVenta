@@ -17,15 +17,29 @@ import javax.swing.table.DefaultTableModel;
 public class frmInventario extends javax.swing.JFrame {
 
     public Producto productoActual = null;
-    private Inventario Inventario = null;
+    public Inventario Inventario = null;
 
     /**
      * Creates new form frmInventario
      */
     public frmInventario() {
         initComponents();
-        DefaultTableModel model = (DefaultTableModel) jTableProductos.getModel();
         Inventario = new Inventario(false);
+        updateJTabel();
+    }
+
+    public Inventario getInventario() {
+        return Inventario;
+    }
+
+    public void setInventario(Inventario Inventario) {
+        this.Inventario = Inventario;
+    }
+    
+    public void updateJTabel(){
+        DefaultTableModel model = (DefaultTableModel) jTableProductos.getModel();
+        model.getDataVector().removeAllElements();
+        model.fireTableDataChanged();
         for (Producto producto : Inventario.getInventario()) {
             model.addRow(new Object[]{producto.getId(),
                 producto.getDescripcion(),
@@ -144,9 +158,21 @@ public class frmInventario extends javax.swing.JFrame {
                             jTableProductos.getModel().getValueAt(
                                     jTableProductos.getSelectedRow(), 2))));
             this.productoActual.
-                    setCantidad(1);
-            frmFactura.setproductoActual(productoActual);
-            this.dispose();
+                    setCantidad(Integer.valueOf(String.valueOf(
+                            jTableProductos.getModel().getValueAt(
+                                    jTableProductos.getSelectedRow(), 3))));
+            if (this.productoActual.getCantidad() <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "No hay producto disponible",
+                        "Atención",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                Inventario.getInventario().get(productoActual.getId() - 1).setCantidad(this.productoActual.getCantidad() - 1);
+                this.productoActual.setCantidad(1);
+                frmFactura.setproductoActual(productoActual);
+                updateJTabel();
+                this.dispose();
+            }
         }
     }//GEN-LAST:event_jBtnSeleccionarActionPerformed
 

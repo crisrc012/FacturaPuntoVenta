@@ -6,9 +6,8 @@
 package cr.ac.uam.view;
 
 import cr.ac.uam.bl.Facturacion;
-import cr.ac.uam.bl.Inventario;
 import cr.ac.uam.domain.Factura;
-import cr.ac.uam.domain.Producto;
+import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,22 +17,29 @@ import javax.swing.table.DefaultTableModel;
  */
 public class frmFacturas extends javax.swing.JFrame {
 
-    public Producto productoActual = null;
-    private Facturacion facturas = null;
+    public Facturacion facturas = null;
 
     /**
      * Creates new form frmInventario
      */
     public frmFacturas() {
         initComponents();
-        DefaultTableModel model = (DefaultTableModel) jTableProductos.getModel();
+        DefaultTableModel model = (DefaultTableModel) jTableFacturas.getModel();
         facturas = new Facturacion();
         for (Factura factura : facturas.getFacturas()) {
             model.addRow(new Object[]{
                 factura.getId(),
-                factura.getCliente().getNombre() + " " + factura.getCliente().getApellido(),
-                factura.getFecha()});
+                new SimpleDateFormat("dd-MM-yyyy").format(factura.getFecha()),
+                factura.getCliente().getNombre() + " " + factura.getCliente().getApellido()});
         }
+    }
+
+    public Facturacion getFacturas() {
+        return facturas;
+    }
+
+    public void setFacturas(Facturacion facturas) {
+        this.facturas = facturas;
     }
 
     /**
@@ -46,13 +52,13 @@ public class frmFacturas extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTableProductos = new javax.swing.JTable();
-        jLabel1 = new javax.swing.JLabel();
+        jTableFacturas = new javax.swing.JTable();
+        jLblFacturas = new javax.swing.JLabel();
         jBtnImprimir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTableProductos.setModel(new javax.swing.table.DefaultTableModel(
+        jTableFacturas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -75,9 +81,9 @@ public class frmFacturas extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTableProductos);
+        jScrollPane1.setViewportView(jTableFacturas);
 
-        jLabel1.setText("Facturas");
+        jLblFacturas.setText("Facturas");
 
         jBtnImprimir.setText("Imprimir");
         jBtnImprimir.addActionListener(new java.awt.event.ActionListener() {
@@ -94,7 +100,7 @@ public class frmFacturas extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
+                        .addComponent(jLblFacturas)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 517, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -106,7 +112,7 @@ public class frmFacturas extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
+                .addComponent(jLblFacturas)
                 .addGap(4, 4, 4)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -117,45 +123,41 @@ public class frmFacturas extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private Factura getFactura(int id) {
+        for (Factura f : facturas.getFacturas()) {
+            if (f.getId() == id) {
+                return f;
+            }
+        }
+        return null;
+    }
+
     private void jBtnImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnImprimirActionPerformed
-        if (jTableProductos.getSelectedRowCount() != 1) {
-            if (jTableProductos.getSelectedRowCount() < 0) {
-                JOptionPane.showMessageDialog(rootPane,
-                        "Por favor seleccionar al menos un producto",
+        if (jTableFacturas.getSelectedRowCount() != 1) {
+            if (jTableFacturas.getSelectedRowCount() <= 0) {
+                JOptionPane.showMessageDialog(this,
+                        "Por favor seleccionar al menos una factura",
                         "Atención",
                         JOptionPane.ERROR_MESSAGE);
             }
-            if (jTableProductos.getSelectedRowCount() > 1) {
-                JOptionPane.showMessageDialog(rootPane,
-                        "Por favor seleccionar al unicamente un producto",
+            if (jTableFacturas.getSelectedRowCount() > 1) {
+                JOptionPane.showMessageDialog(this,
+                        "Por favor seleccionar unicamente una factura",
                         "Atención",
                         JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            productoActual = new Producto();
-            this.productoActual.
-                    setId(Integer.valueOf(String.valueOf(
-                            jTableProductos.getModel().getValueAt(
-                                    jTableProductos.getSelectedRow(), 0))));
-            this.productoActual.
-                    setDescripcion(String.valueOf(
-                            jTableProductos.getModel().getValueAt(
-                                    jTableProductos.getSelectedRow(), 1)));
-            this.productoActual.
-                    setValor(Double.valueOf(String.valueOf(
-                            jTableProductos.getModel().getValueAt(
-                                    jTableProductos.getSelectedRow(), 2))));
-            this.productoActual.
-                    setCantidad(1);
-            frmFactura.setproductoActual(productoActual);
+            Factura factura = getFactura((int) jTableFacturas.getValueAt(
+                    jTableFacturas.getSelectedRow(), 0));
+
             this.dispose();
         }
     }//GEN-LAST:event_jBtnImprimirActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnImprimir;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLblFacturas;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTableProductos;
+    private javax.swing.JTable jTableFacturas;
     // End of variables declaration//GEN-END:variables
 }

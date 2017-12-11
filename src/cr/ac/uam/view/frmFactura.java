@@ -7,6 +7,7 @@ package cr.ac.uam.view;
 
 import cr.ac.uam.bl.Inventario;
 import cr.ac.uam.domain.Cliente;
+import cr.ac.uam.domain.Factura;
 import cr.ac.uam.domain.Producto;
 import java.awt.HeadlessException;
 import java.text.SimpleDateFormat;
@@ -36,7 +37,6 @@ public class frmFactura extends javax.swing.JFrame {
     public frmFactura() {
         initComponents();
         Productos = new Inventario(true);
-        System.out.println(new SimpleDateFormat("dd-MM-yyyy").format(new Date()));
     }
 
     /**
@@ -249,6 +249,15 @@ public class frmFactura extends javax.swing.JFrame {
         frmclientes.toFront();
     }
 
+    private void clear() {
+        jLabelCedValue.setText("-");
+        jLabelNomValue.setText("-");
+        jLabelTotalValue.setText("0");
+        DefaultTableModel model = (DefaultTableModel) jTableFactura.getModel();
+        model.getDataVector().removeAllElements();
+        model.fireTableDataChanged();
+    }
+
     private void jBtnAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAgregarProductoActionPerformed
         addProducto();
     }//GEN-LAST:event_jBtnAgregarProductoActionPerformed
@@ -286,10 +295,16 @@ public class frmFactura extends javax.swing.JFrame {
                         JOptionPane.ERROR_MESSAGE);
             }
         } else {
-            int id = Integer.parseInt(
-                    String.valueOf(
-                            jTableFactura.getValueAt(
-                                    jTableFactura.getSelectedRow(), 0)));
+            int id = Integer.parseInt(String.valueOf(jTableFactura.getValueAt(
+                    jTableFactura.getSelectedRow(), 0)));
+            long cantidad = Long.parseLong(String.valueOf(jTableFactura.getValueAt(
+                    jTableFactura.getSelectedRow(), 3)));
+            if (frminventario == null) {
+                frminventario = new frmInventario();
+            }
+            long cantidadTotal = cantidad + frminventario.getInventario().getInventario().get(id - 1).getCantidad();
+            frminventario.getInventario().getInventario().get(id - 1).setCantidad(cantidadTotal);
+            frminventario.updateJTabel();
             Productos.removeProducto(id);
             setTotal();
             DefaultTableModel model = (DefaultTableModel) jTableFactura.getModel();
@@ -333,9 +348,25 @@ public class frmFactura extends javax.swing.JFrame {
                             String.valueOf(
                                     jTableFactura.getValueAt(
                                             jTableFactura.getSelectedRow(), 0)));
-                    Productos.editProducto(id, cantidad);
-                    setTotal();
-                    updateJTable();
+                    long cantidadJtable = Long.parseLong(
+                            String.valueOf(
+                                    jTableFactura.getValueAt(
+                                            jTableFactura.getSelectedRow(), 3)));
+                    long cantidadActual = frminventario.getInventario().getInventario().get(id - 1).getCantidad();
+                    cantidad = cantidad - cantidadJtable;
+                    cantidadActual = cantidadActual - cantidad;
+                    if (cantidadActual >= 0) {
+                        Productos.editProducto(id, cantidad + cantidadJtable);
+                        frminventario.getInventario().getInventario().get(id - 1).setCantidad(cantidadActual);
+                        frminventario.updateJTabel();
+                        setTotal();
+                        updateJTable();
+                    } else {
+                        JOptionPane.showMessageDialog(rootPane,
+                                "No existe tanto producto en inventario",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             } catch (HeadlessException | NumberFormatException ex) {
                 JOptionPane.showMessageDialog(rootPane,
@@ -360,9 +391,23 @@ public class frmFactura extends javax.swing.JFrame {
                     JOptionPane.ERROR_MESSAGE);
             addProducto();
         } else {
-            
+            if (frmfacturas == null) {
+                frmfacturas = new frmFacturas();
+            }
+            Factura factura
+                    = new Factura(
+                            frmfacturas.getFacturas().getFacturas().size(),
+                            clienteActual,
+                            new Date(),
+                            Productos.getInventario());
+            if (frminventario == null) {
+                frminventario = new frmInventario();
+            }
+
+            clear();
         }
     }//GEN-LAST:event_jBtnFacturarActionPerformed
+
 
     private void jMenuItemImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemImprimirActionPerformed
         if (frmfacturas == null) {
