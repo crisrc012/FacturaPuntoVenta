@@ -10,7 +10,6 @@ import cr.ac.uam.domain.Cliente;
 import cr.ac.uam.domain.Factura;
 import cr.ac.uam.domain.Producto;
 import java.awt.HeadlessException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -256,6 +255,8 @@ public class frmFactura extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) jTableFactura.getModel();
         model.getDataVector().removeAllElements();
         model.fireTableDataChanged();
+        clienteActual = null;
+        productoActual = null;
     }
 
     private void jBtnAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAgregarProductoActionPerformed
@@ -396,14 +397,11 @@ public class frmFactura extends javax.swing.JFrame {
             }
             Factura factura
                     = new Factura(
-                            frmfacturas.getFacturas().getFacturas().size(),
+                            frmfacturas.getFacturas().getFacturas().size() + 1,
                             clienteActual,
                             new Date(),
                             Productos.getInventario());
-            if (frminventario == null) {
-                frminventario = new frmInventario();
-            }
-
+            frmfacturas.addFactura(factura);
             clear();
         }
     }//GEN-LAST:event_jBtnFacturarActionPerformed

@@ -5,11 +5,29 @@
  */
 package cr.ac.uam.view;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import cr.ac.uam.bl.Facturacion;
 import cr.ac.uam.domain.Factura;
+import cr.ac.uam.domain.Producto;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+//http://www.vogella.com/tutorials/JavaPDF/article.html
 
 /**
  *
@@ -24,22 +42,29 @@ public class frmFacturas extends javax.swing.JFrame {
      */
     public frmFacturas() {
         initComponents();
-        DefaultTableModel model = (DefaultTableModel) jTableFacturas.getModel();
         facturas = new Facturacion();
-        for (Factura factura : facturas.getFacturas()) {
-            model.addRow(new Object[]{
-                factura.getId(),
-                new SimpleDateFormat("dd-MM-yyyy").format(factura.getFecha()),
-                factura.getCliente().getNombre() + " " + factura.getCliente().getApellido()});
-        }
+        updateJTable();
     }
 
     public Facturacion getFacturas() {
         return facturas;
     }
-
-    public void setFacturas(Facturacion facturas) {
-        this.facturas = facturas;
+    
+    public void addFactura(Factura factura){
+        this.facturas.getFacturas().add(factura);
+        updateJTable();
+    }
+    
+    private void updateJTable() {
+        DefaultTableModel model = (DefaultTableModel) jTableFacturas.getModel();
+        model.getDataVector().removeAllElements();
+        model.fireTableDataChanged();
+        for (Factura factura : this.facturas.getFacturas()) {
+            model.addRow(new Object[]{
+                factura.getId(),
+                new SimpleDateFormat("dd-MM-yyyy").format(factura.getFecha()),
+                factura.getCliente().getNombre() + " " + factura.getCliente().getApellido()});
+        }
     }
 
     /**
@@ -149,10 +174,81 @@ public class frmFacturas extends javax.swing.JFrame {
         } else {
             Factura factura = getFactura((int) jTableFacturas.getValueAt(
                     jTableFacturas.getSelectedRow(), 0));
-
+            try {
+                imprimirFactura(factura);
+            } catch (IOException ex) {
+                Logger.getLogger(frmFacturas.class.getName()).log(Level.SEVERE, null, ex);
+            }
             this.dispose();
         }
     }//GEN-LAST:event_jBtnImprimirActionPerformed
+
+    private void imprimirFactura(Factura factura) throws IOException {
+        String FILE = "C:/Users/crobles/Desktop/Invoice.pdf";
+        Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18,
+                Font.BOLD);
+        Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16,
+                Font.BOLD);
+        Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12,
+                Font.BOLD);
+        try {
+            Document document = new Document();
+            PdfWriter.getInstance(document, new FileOutputStream(FILE));
+            document.open();
+            Paragraph header = new Paragraph();
+            header.add(new Paragraph("Factura # " + factura.getId(), catFont));
+            header.add(new Paragraph(
+                    "\n\nFecha: " + new SimpleDateFormat("dd-MM-yyyy").format(factura.getFecha()),
+                    smallBold));
+            header.add(new Paragraph(
+                    "\nCédula: " + factura.getCliente().getCedula(), smallBold));
+            header.add(new Paragraph(
+                    "Cliente: "
+                    + factura.getCliente().getNombre() + " "
+                    + factura.getCliente().getApellido(), smallBold));
+            document.add(header);
+
+            //Tabla
+            Paragraph paragraphTable = new Paragraph("\nProductos:", subFont);
+            PdfPTable table = new PdfPTable(4);
+            PdfPCell c1 = new PdfPCell(new Phrase("Código"));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(c1);
+            c1 = new PdfPCell(new Phrase("Descripción"));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(c1);
+            c1 = new PdfPCell(new Phrase("Cantidad"));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(c1);
+            c1 = new PdfPCell(new Phrase("Precio Unitario"));
+            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            table.addCell(c1);
+            table.setHeaderRows(1);
+            // Datos Codigo, Descripción, Cantidad, Precio
+            Double subtotal = 0.0;
+            for (Producto p : factura.getProductos()) {
+                table.addCell(String.valueOf(p.getId()));
+                table.addCell(p.getDescripcion());
+                table.addCell(String.valueOf(p.getCantidad()));
+                table.addCell(String.valueOf(p.getValor()));
+                subtotal += p.getCantidad() * p.getValor();
+            }
+            paragraphTable.add(table);
+            document.add(paragraphTable);
+
+            //Pie de página
+            Double impuesto = subtotal * 0.13;
+            Double total = subtotal + impuesto;
+            Paragraph footer = new Paragraph();
+            footer.add(new Paragraph("\n\nSubtotal: " + subtotal));
+            footer.add(new Paragraph("Impuesto: " + impuesto));
+            footer.add(new Paragraph("Total: " + total));
+            document.add(footer);
+            document.close();
+            Desktop.getDesktop().open(new File(FILE));
+        } catch (DocumentException | FileNotFoundException e) {
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBtnImprimir;

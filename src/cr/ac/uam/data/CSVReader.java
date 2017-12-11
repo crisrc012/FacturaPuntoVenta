@@ -111,11 +111,13 @@ public class CSVReader {
                 String[] idProductos = attributes[3].split(",");
                 Inventario inventario = new Inventario(false);
                 ArrayList<Producto> productos = new ArrayList<>();
-                Producto producto = null;
+                Producto producto;
                 for (int i = 0; i < idProductos.length; i++) {
                     for (int j = 0; j < inventario.getInventario().size(); j++) {
-                        if (Integer.parseInt(idProductos[i]) == inventario.getInventario().get(j).getId()) {
-                            productos.add(inventario.getInventario().get(j));
+                        if (Integer.parseInt(idProductos[i].split("-")[0]) == inventario.getInventario().get(j).getId()) {
+                            producto = inventario.getInventario().get(j);
+                            producto.setCantidad(Long.valueOf(idProductos[i].split("-")[1]));
+                            productos.add(producto);
                         }
                     }
                 }
